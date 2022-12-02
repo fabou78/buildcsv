@@ -57,10 +57,14 @@ def parse_text(my_list, year):
             items[0] = items[0][:2]
 
         date_field = items[0] + '-' + MONTH[items[1]] + '-' + year
-        desc_field = ' '.join(items[2 : len(items) - 1])
-        price_field = items[len(items) - 1]
+        desc_field = ' '.join(items[2 : (len(items) - 1)])
+        price_field = (items[len(items) - 1]).strip()
 
-        new_line = date_field + ',' + desc_field + ',' + price_field
+        if 'CR' in desc_field:
+            desc_field = desc_field.replace('CR', '').strip()
+            new_line = date_field + ',' + desc_field + ',' + price_field + ','
+        else:
+            new_line = date_field + ',' + desc_field + ',,' + price_field
         print(new_line)
 
 
