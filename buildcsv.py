@@ -25,7 +25,8 @@ MONTH = {
 
 my_parser = argparse.ArgumentParser(
     prog='buildcsv',
-    description='Convert text from bank export to csv',
+    description='''Convert text from bank exported stament to CSV. The CSV
+    can then later be imported into GNUcash.''',
     allow_abbrev=False,
 )
 my_parser.add_argument(
@@ -55,13 +56,13 @@ def save_file(rows):
         writer = csv.writer(fileobj)
         writer.writerows(rows)
         fileobj.close()
+    print(f'File {args.outputfile} has been created in the current directory')
 
 
 def parse_text(my_list, year):
     new_file = []
     for line in my_list:
         line = line.strip()
-        print(line)
         items = line.split(' ')
         if len(items[0]) == 3:
             items[0] = '0' + items[0][:1]
@@ -70,6 +71,7 @@ def parse_text(my_list, year):
         date_field = items[0] + '-' + MONTH[items[1]] + '-' + str(year)
         desc_field = ' '.join(items[2 : (len(items) - 1)])
         price_field = (items[len(items) - 1]).strip()
+        price_field = price_field.replace(',', '')
         if 'CR' in desc_field:
             desc_field = desc_field.replace('CR', '').strip()
             new_line = [date_field, desc_field, price_field, None]
