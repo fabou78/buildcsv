@@ -1,5 +1,6 @@
 #! /home/fabrice/Py3venv/buildcsv/.venv/bin/python
 import argparse
+import csv
 
 
 MONTH = {
@@ -18,7 +19,9 @@ MONTH = {
 }
 
 
-# TODO get the year from the current date (using datetime.date)
+# TODO
+#   get the year from the current date (using datetime.date)
+#   if -y is used test that value entered is a valid 4 digit year
 
 my_parser = argparse.ArgumentParser(
     prog='buildcsv',
@@ -39,6 +42,7 @@ my_parser.add_argument(
     '-y',
     '--year',
     help='Year to be used for the the transactions',
+    type=int,
     default='2022',
     dest='year',
 )
@@ -46,26 +50,33 @@ my_parser.add_argument(
 args = my_parser.parse_args()
 
 
+def save_file(rows):
+    with open(args.outputfile, 'w') as fileobj:
+        writer = csv.writer(fileobj)
+        writer.writerows(rows)
+        fileobj.close()
+
+
 def parse_text(my_list, year):
+    new_file = []
     for line in my_list:
+        line = line.strip()
         print(line)
-        # size = len(line)
         items = line.split(' ')
         if len(items[0]) == 3:
             items[0] = '0' + items[0][:1]
         else:
             items[0] = items[0][:2]
-
-        date_field = items[0] + '-' + MONTH[items[1]] + '-' + year
+        date_field = items[0] + '-' + MONTH[items[1]] + '-' + str(year)
         desc_field = ' '.join(items[2 : (len(items) - 1)])
         price_field = (items[len(items) - 1]).strip()
-
         if 'CR' in desc_field:
             desc_field = desc_field.replace('CR', '').strip()
-            new_line = date_field + ',' + desc_field + ',' + price_field + ','
+            new_line = [date_field, desc_field, price_field, None]
         else:
-            new_line = date_field + ',' + desc_field + ',,' + price_field
-        print(new_line)
+            new_line = [date_field, desc_field, None, price_field]
+        new_file.append(new_line)
+    save_file(new_file)
 
 
 try:
