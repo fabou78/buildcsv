@@ -54,7 +54,9 @@ def parse_text(file_content):
         if 'Description' in line:
             description = line.split(':')
             if len(description) == 2 and len(row) == 1:
-                description = description[-1].strip()
+                description = (
+                    description[-1].replace('&amp;', '&').replace('   ', ' ').strip()
+                )
                 row.append(description)
             else:
                 # If the line contain more than one ':' it will fail parsing
@@ -63,7 +65,7 @@ def parse_text(file_content):
         if 'Amount' in line:
             amount = line.split(':')
             if len(amount) == 2 and len(row) == 2:
-                amount = amount[-1].strip()
+                amount = amount[-1].replace('GBP', '').strip()
                 row.append(amount)
                 master_list.append(row)
                 print(row)
@@ -77,7 +79,7 @@ def parse_text(file_content):
 
 
 try:
-    with open(args.inputfile, 'r') as fileobj:
+    with open(args.inputfile, 'r', encoding='iso-8859-1') as fileobj:
         file_content = fileobj.readlines()
         fileobj.close()
 except FileNotFoundError:
