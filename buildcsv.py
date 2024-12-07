@@ -44,7 +44,7 @@ my_parser.add_argument(
     '--year',
     help='Year to be used for the the transactions',
     type=int,
-    default='2022',
+    default='2024',
     dest='year',
 )
 
