@@ -1,7 +1,8 @@
-#! /home/fabrice/Py3venv/buildcsv/.venv/bin/python
+#! /usr/bin/python3
+# This script should be installed in ~/.local/bin
+
 import argparse
 import csv
-
 
 MONTH = {
     'Jan': '01',
