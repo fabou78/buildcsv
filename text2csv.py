@@ -1,6 +1,19 @@
-#! /home/fabrice/Py3venv/buildcsv/.venv/bin/python
+#! /usr/bin/python3
+# This script should be installed in ~/.local/bin
+
 import argparse
 import csv
+
+
+# Defining colors for terminal
+class tc:
+    HEADER = '\033[95m'
+    OKGRE = '\033[1;92m'
+    WARN = '\033[1;93m'
+    FAIL = '\033[1;91m'
+    CYAN = '\033[1;36m'
+    ENDC = '\033[0m'
+
 
 my_parser = argparse.ArgumentParser(
     prog='buildcsv',
@@ -14,17 +27,9 @@ my_parser.add_argument(
 my_parser.add_argument(
     '-o',
     '--output',
-    help='csv file to write to',
+    help='CSV file to write to. DEFAULT to "output.csv"',
     default='output.csv',
     dest='outputfile',
-)
-my_parser.add_argument(
-    '-y',
-    '--year',
-    help='Year to be used for the the transactions',
-    type=int,
-    default='2024',
-    dest='year',
 )
 
 args = my_parser.parse_args()
@@ -35,7 +40,10 @@ def save_file(rows):
         writer = csv.writer(fileobj)
         writer.writerows(rows)
         fileobj.close()
-    print(f'File {args.outputfile} has been created in the current directory')
+    print(
+        f'\nFile {tc.WARN}{args.outputfile}{tc.ENDC} has been created '
+        f'in the current directory'
+    )
 
 
 def parse_text(file_content):
@@ -49,7 +57,10 @@ def parse_text(file_content):
                 row.append(date)
             else:
                 # If the line contain more than one ':' it will fail parsing
-                print('There was an issue parsing the file')
+                print(
+                    f'\nThere was an issue parsing the date at the following line: '
+                    f'{tc.FAIL}"{line.strip('\n')}"{tc.ENDC}'
+                )
                 exit()
         if 'Description' in line:
             description = line.split(':')
@@ -60,7 +71,10 @@ def parse_text(file_content):
                 row.append(description)
             else:
                 # If the line contain more than one ':' it will fail parsing
-                print('There was an issue parsing the file')
+                print(
+                    f'\nThere was an issue parsing the description at the following '
+                    f'line: {tc.FAIL}"{line.strip('\n')}"{tc.ENDC}'
+                )
                 exit()
         if 'Amount' in line:
             amount = line.split(':')
@@ -68,13 +82,16 @@ def parse_text(file_content):
                 amount = amount[-1].replace('GBP', '').strip()
                 row.append(amount)
                 master_list.append(row)
-                print(row)
+                print(f'{tc.CYAN}{row}{tc.ENDC}')
                 row = []
             else:
                 # If the line contain more than one ':' it will fail parsing
-                print('There was an issue parsing the file')
+                print(
+                    f'\nThere was an issue parsing the amount at the following line: '
+                    f'{tc.FAIL}"{line.strip('\n')}"{tc.ENDC}'
+                )
                 exit()
-    print(f'Found {len(master_list)} entries to import')
+    print(f'\nImported {tc.OKGRE}{len(master_list)}{tc.ENDC} entries.')
     save_file(master_list)
 
 
